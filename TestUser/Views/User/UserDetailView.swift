@@ -13,7 +13,7 @@ struct UserDetailView: View {
     
     @EnvironmentObject var vm: HomeViewControllerViewModel
     @StateObject var userVM = UserDetailViewViewModel()
-    @State private var noteText: String = ""
+    @State private var noteText: String = "Enter notes..."
     
     var body: some View {
         
@@ -55,10 +55,25 @@ struct UserDetailView: View {
                 Text("Notes:")
                     .frame(maxWidth: .infinity, alignment: .leading)
                 
-                TextField("Enter notes here...", text: $userVM.notes, axis: .vertical)
-                    .border(.secondary)
-                    .textFieldStyle(.roundedBorder)
-                    .lineLimit(6, reservesSpace: true)
+                ZStack {
+                    
+                    TextEditor(text:$userVM.notes)
+                        .frame(height: 150)
+                        .cornerRadius(10, antialiased: true)
+                        .font(.body)
+                        .padding()
+                        .border(Color.gray, width: 1)
+                        .fixedSize(horizontal: false, vertical: true)
+                        .multilineTextAlignment(.leading)
+                    
+                    if self.userVM.notes.isEmpty {
+                        TextEditor(text: $noteText)
+                            .font(.body)
+                            .foregroundColor(.gray)
+                            .disabled(true)
+                            .padding()
+                    }
+                }
                 
                 Button(action: {
                     userVM.saveNotes()
@@ -80,7 +95,7 @@ struct UserDetailView: View {
                 }
                 Spacer()
             }
-
+            
             .padding()
             .onAppear {
                 userVM.fetchUserDetail(with: vm.selectedUser ?? "")
